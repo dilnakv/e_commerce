@@ -3,6 +3,7 @@ import 'package:e_commerce/component/product_toolbar.dart';
 import 'package:e_commerce/model/product.dart';
 import 'package:e_commerce/model/cart_item.dart';
 import 'package:e_commerce/provider/cart_notifier.dart';
+import 'package:e_commerce/provider/quantity_provider.dart';
 import 'package:e_commerce/screens/cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,10 +18,25 @@ class ProductScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductScreenState extends ConsumerState<ProductScreen> {
-  int currentNumber = 1;
+  @override
+  void initState() {
+    super.initState();
+
+    // Delay the provider modification until after build
+    Future.microtask(() {
+      final cart = ref.read(cartProvider);
+      final existingItem = cart.firstWhere(
+        (item) => item.product.id == widget.product.id,
+        orElse: () => CartItem(product: widget.product, quantity: 1),
+      );
+
+      ref.read(quantityProvider.notifier).state = existingItem.quantity;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final quantity = ref.watch(quantityProvider);
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -165,11 +181,14 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                           children: [
                                             IconButton(
                                               onPressed: () {
-                                                setState(() {
-                                                  if (currentNumber > 1) {
-                                                    currentNumber--;
-                                                  }
-                                                });
+                                                if (quantity > 1) {
+                                                  ref
+                                                      .read(
+                                                        quantityProvider
+                                                            .notifier,
+                                                      )
+                                                      .state--;
+                                                }
                                               },
                                               icon: const Icon(
                                                 Icons.remove_outlined,
@@ -177,16 +196,18 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                               ),
                                             ),
                                             Text(
-                                              currentNumber.toString(),
+                                              quantity.toString(),
                                               style: const TextStyle(
                                                 color: AppColors.white,
                                               ),
                                             ),
                                             IconButton(
                                               onPressed: () {
-                                                setState(() {
-                                                  currentNumber++;
-                                                });
+                                                ref
+                                                    .read(
+                                                      quantityProvider.notifier,
+                                                    )
+                                                    .state++;
                                               },
                                               icon: const Icon(
                                                 Icons.add_outlined,
@@ -198,13 +219,13 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                       ),
                                       GestureDetector(
                                         onTap: () {
-                                          if (currentNumber > 0) {
+                                          if (quantity > 0) {
                                             ref
                                                 .read(cartProvider.notifier)
                                                 .addToCart(
                                                   CartItem(
                                                     product: widget.product,
-                                                    quantity: currentNumber,
+                                                    quantity: quantity,
                                                   ),
                                                 );
                                             ScaffoldMessenger.of(
