@@ -3,6 +3,7 @@ import 'package:e_commerce/component/product_toolbar.dart';
 import 'package:e_commerce/model/product.dart';
 import 'package:e_commerce/model/cart_item.dart';
 import 'package:e_commerce/provider/cart_notifier.dart';
+import 'package:e_commerce/screens/cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -211,6 +212,15 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                             ).showSnackBar(
                                               const SnackBar(
                                                 content: Text('Added to cart'),
+                                              ),
+                                            );
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const CartScreen(
+                                                      showBack: true,
+                                                    ),
                                               ),
                                             );
                                           }

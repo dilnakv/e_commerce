@@ -85,7 +85,7 @@ class CartTile extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: onDelete,
-                icon: const Icon(Icons.delete, color: AppColors.grey, size: 20),
+                icon: const Icon(Icons.delete, color: AppColors.black, size: 20),
               ),
               Container(
                 height: 40,

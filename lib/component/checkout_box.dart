@@ -1,5 +1,4 @@
 import 'package:e_commerce/colors/color.dart';
-import 'package:e_commerce/main.dart';
 import 'package:e_commerce/model/cart_item.dart';
 import 'package:e_commerce/screens/dashboard_screen.dart';
 import 'package:flutter/material.dart';
