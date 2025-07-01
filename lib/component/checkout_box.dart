@@ -1,5 +1,7 @@
 import 'package:e_commerce/colors/color.dart';
+import 'package:e_commerce/main.dart';
 import 'package:e_commerce/model/cart_item.dart';
+import 'package:e_commerce/screens/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 
 class CheckOutBox extends StatelessWidget {
@@ -49,7 +51,8 @@ class CheckOutBox extends StatelessWidget {
             onPressed: total == 0.0
                 ? null
                 : () {
-                    // Your checkout logic here
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    DashboardScreenState.goToTab(0);
                   },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,

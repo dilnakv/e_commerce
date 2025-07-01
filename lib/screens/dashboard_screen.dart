@@ -7,13 +7,31 @@ class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<DashboardScreen> createState() => DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class DashboardScreenState extends State<DashboardScreen> {
+  static late DashboardScreenState instance;
+
   int selectedIndex = 0;
 
   final _pages = [HomeScreen(), CartScreen()];
+
+  @override
+  void initState() {
+    super.initState();
+    instance = this; // set the static instance
+  }
+
+  static void goToTab(int index) {
+    instance._setTab(index);
+  }
+  
+  void _setTab(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.grey,
         currentIndex: selectedIndex,
-        onTap: (newIndex) {
-          setState(() {
-            selectedIndex = newIndex;
-          });
-        },
+        onTap: (newIndex) => _setTab(newIndex),
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(

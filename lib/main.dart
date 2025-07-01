@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+final GlobalKey<DashboardScreenState> dashboardKey = GlobalKey<DashboardScreenState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
         useMaterial3: true,
       ),
-      home:  hasSeenOnboarding ? DashboardScreen() : OnboardingScreen(),
+      home:  hasSeenOnboarding ? DashboardScreen(key: dashboardKey) : OnboardingScreen(),
     );
   }
 }
