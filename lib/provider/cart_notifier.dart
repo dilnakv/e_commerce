@@ -6,6 +6,7 @@ import '../model/cart_item.dart';
 final cartProvider = StateNotifierProvider<CartNotifier, List<CartItem>>((ref) {
   return CartNotifier();
 });
+
 class CartNotifier extends StateNotifier<List<CartItem>> {
   static const _storageKey = 'cart_items';
 
@@ -73,5 +74,15 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
     state = state.where((e) => e.product.id != item.product.id).toList();
     _saveCart();
   }
-}
 
+  void updateQuantity(int productId, int quantity) {
+    state = [
+      for (final item in state)
+        if (item.product.id == productId)
+          CartItem(product: item.product, quantity: quantity)
+        else
+          item,
+    ];
+    _saveCart();
+  }
+}

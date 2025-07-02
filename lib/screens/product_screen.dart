@@ -21,8 +21,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Delay the provider modification until after build
+    
     Future.microtask(() {
       final cart = ref.read(cartProvider);
       final existingItem = cart.firstWhere(
@@ -30,13 +29,14 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
         orElse: () => CartItem(product: widget.product, quantity: 1),
       );
 
-      ref.read(quantityProvider.notifier).state = existingItem.quantity;
+      ref.read(quantityProvider(widget.product.id).notifier).state = existingItem.quantity;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final quantity = ref.watch(quantityProvider);
+    final quantity = ref.watch(quantityProvider(widget.product.id));
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -158,13 +158,10 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                     borderRadius: BorderRadius.circular(50),
                                     color: AppColors.black,
                                   ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 15),
                                   alignment: Alignment.center,
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Container(
                                         height: 40,
@@ -173,21 +170,14 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                             color: AppColors.grey,
                                             width: 2,
                                           ),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
+                                          borderRadius: BorderRadius.circular(20),
                                         ),
                                         child: Row(
                                           children: [
                                             IconButton(
                                               onPressed: () {
                                                 if (quantity > 1) {
-                                                  ref
-                                                      .read(
-                                                        quantityProvider
-                                                            .notifier,
-                                                      )
-                                                      .state--;
+                                                  ref.read(quantityProvider(widget.product.id).notifier).state--;
                                                 }
                                               },
                                               icon: const Icon(
@@ -203,11 +193,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                             ),
                                             IconButton(
                                               onPressed: () {
-                                                ref
-                                                    .read(
-                                                      quantityProvider.notifier,
-                                                    )
-                                                    .state++;
+                                                ref.read(quantityProvider(widget.product.id).notifier).state++;
                                               },
                                               icon: const Icon(
                                                 Icons.add_outlined,
@@ -219,45 +205,42 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                       ),
                                       GestureDetector(
                                         onTap: () {
-                                          if (quantity > 0) {
-                                            ref
-                                                .read(cartProvider.notifier)
-                                                .addToCart(
-                                                  CartItem(
-                                                    product: widget.product,
-                                                    quantity: quantity,
-                                                  ),
-                                                );
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              const SnackBar(
-                                                content: Text('Added to cart'),
-                                              ),
+                                          final cart = ref.read(cartProvider);
+                                          final exists = cart.any((item) => item.product.id == widget.product.id);
+
+                                          if (exists) {
+                                            ref.read(cartProvider.notifier).updateQuantity(
+                                              widget.product.id,
+                                              quantity,
                                             );
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const CartScreen(
-                                                      showBack: true,
-                                                    ),
+                                          } else {
+                                            ref.read(cartProvider.notifier).addToCart(
+                                              CartItem(
+                                                product: widget.product,
+                                                quantity: quantity,
                                               ),
                                             );
                                           }
+
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(content: Text('Cart updated')),
+                                          );
+
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => const CartScreen(showBack: true),
+                                            ),
+                                          );
                                         },
                                         child: Container(
                                           height: 30,
                                           decoration: BoxDecoration(
                                             color: AppColors.primary,
-                                            borderRadius: BorderRadius.circular(
-                                              60,
-                                            ),
+                                            borderRadius: BorderRadius.circular(60),
                                           ),
                                           alignment: Alignment.center,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 20,
-                                          ),
+                                          padding: const EdgeInsets.symmetric(horizontal: 20),
                                           child: const Text(
                                             'Add to Cart',
                                             style: TextStyle(
